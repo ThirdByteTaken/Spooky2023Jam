@@ -13,6 +13,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private bool Can_Jump;
 
+
+    private Animator anim;
     private Rigidbody2D rb;
     private Camera mainCamera;
 
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         mainCamera = Camera.main;
         if (PersistentData.Instance.positionDictionary.ContainsKey(SceneManager.GetActiveScene().name))
             transform.position = PersistentData.Instance.positionDictionary[SceneManager.GetActiveScene().name];
@@ -42,6 +45,15 @@ public class Player : MonoBehaviour
 
         Vector2 velocity = rb.velocity;
         velocity.x = xMovement * Movement_Speed;
+        if (velocity.x == 0) anim.SetBool("Walking", false);
+        else
+        {
+            anim.SetBool("Walking", true);
+            Vector3 localScale = transform.localScale;
+            localScale.x = (velocity.x > 0) ? 0.4f : -0.4f;
+            Lore.Instance.transform.localScale = (velocity.x > 0) ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
+            transform.localScale = localScale;
+        }
         rb.velocity = velocity;
     }
 
@@ -56,7 +68,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         Vector3 cameraPos = mainCamera.transform.position;
-        cameraPos.x = transform.position.x;
+        cameraPos.x = Mathf.Clamp(transform.position.x, -5, 35);
         mainCamera.transform.position = cameraPos;
     }
 }
