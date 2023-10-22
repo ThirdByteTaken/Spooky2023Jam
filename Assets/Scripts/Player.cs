@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -16,12 +17,14 @@ public class Player : MonoBehaviour
     private Camera mainCamera;
 
     private bool isGrounded = true;
-    
+
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
+        if (PersistentData.Instance.positionDictionary.ContainsKey(SceneManager.GetActiveScene().name))
+            transform.position = PersistentData.Instance.positionDictionary[SceneManager.GetActiveScene().name];
     }
 
     // Better for physics
@@ -35,7 +38,7 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(new Vector2(0, Jump_Height));
             isGrounded = false;
-	    }
+        }
 
         Vector2 velocity = rb.velocity;
         velocity.x = xMovement * Movement_Speed;
@@ -47,7 +50,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Floor"))
         {
             isGrounded = true;
-	    }
+        }
     }
 
     private void Update()
